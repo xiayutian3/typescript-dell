@@ -1,7 +1,7 @@
 //分析的逻辑
 import fs from 'fs'
 import cheerio from "cheerio"
-import {Analyzer} from './crowller'
+import { Analyzer } from './crowller'
 
 //定义Cource接口
 interface Cource {
@@ -17,7 +17,20 @@ interface Content {
 }
 
 
-export default class DellAnalyzer implements Analyzer{
+export default class DellAnalyzer implements Analyzer {
+  // 访问static成员，用类(class)而不是实例化的对象。
+  // static方法只能访问static属性
+  private static instance: DellAnalyzer
+  //单例模式，只能在类里面new
+  static getInstance() {
+    if (!DellAnalyzer.instance) {
+      DellAnalyzer.instance = new DellAnalyzer();
+    }
+    return DellAnalyzer.instance
+  }
+
+
+
   //cheerio 转化后类似于，jq操作  爬取电影名
   private getCourseInfo(html: string) {
     const courseInfos: Cource[] = []
@@ -57,5 +70,6 @@ export default class DellAnalyzer implements Analyzer{
     const { fileContent } = this.generateJsonContent(courseContent, filePath)
     return JSON.stringify(fileContent)
   }
+  private constructor() { } //单例模式
 }
 

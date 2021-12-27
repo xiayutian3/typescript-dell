@@ -16,7 +16,7 @@ class Crowller {
   private filePath = path.resolve(__dirname, '../data/course.json')
 
   //爬取html
-  async getRawHtml() {
+  private async getRawHtml() {
     const result = await superagent.get(this.url)
     return result.text
     //爬出html返回的内容 result.text
@@ -25,12 +25,12 @@ class Crowller {
   }
 
   //写入文件
-  writeFile(content: string) {
+  private writeFile(content: string) {
     fs.writeFileSync(this.filePath, content)
   }
 
   //入口，编码规范 减少耦合
-  async initSpiderProcess() {
+  private async initSpiderProcess() {
     const html = await this.getRawHtml()
     // const courseContent = this.getCourseInfo(html)
     // const {fileContent} = this.generateJsonContent(courseContent)
@@ -48,5 +48,7 @@ class Crowller {
 //爬取电影网站 
 const url = `https://www.xbshare.cc/hot/hotmovie.html`
 
-const analyzer = new DellAnalyzer()
+//变成单例模式后，不能被外部new
+// const analyzer = new DellAnalyzer()
+const analyzer = DellAnalyzer.getInstance()
 const crowller = new Crowller(url, analyzer)
