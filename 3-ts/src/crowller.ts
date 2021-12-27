@@ -4,54 +4,16 @@
 import fs from 'fs'
 import path from 'path'
 import superagent from "superagent";
-import cheerio from "cheerio"
+// import cheerio from "cheerio"
+import DellAnalyzer from './DellAnalyzer'
 
-
-//定义Cource接口
-interface Cource {
-  title: string;
-  year: string;
-}
-interface CourceResult {
-  time: number;
-  data:Cource[]
-}
-interface Content {
-  [propName:number]: Cource[];
+export interface Analyzer {
+  analyze: (html: string, filePath: string) => string;
 }
 
 
 class Crowller {
-  private secret = 'secretKey'
-  //模拟要爬取的网站
-  // private url = `https://www.xbshare.cc/hot/hotmovie.html?secret=${this.secret}`
-  //爬取电影网站 
-  private url = `https://www.xbshare.cc/hot/hotmovie.html`
-
-  //cheerio 转化后类似于，jq操作  爬取电影名
-  getCourseInfo(html: string) {
-    const courseInfos: Cource[] = []
-    const $ = cheerio.load(html);
-    const courseItems = $('.title-wrapper')
-    // const courseItems = $('.title-wrapper h3 a')
-    courseItems.map((index, element) => {
-      //标题
-      const title = $(element).find('a').text()
-      //年份
-      const year = $(element).find('.small').text()
-
-      // console.log('title: ', title);
-      courseInfos.push({ title, year })
-    })
-
-    //最后结果
-    return {
-      time: new Date().getTime(),
-      data: courseInfos
-    }
-  }
-
-
+  private filePath = path.resolve(__dirname, '../data/course.json')
 
   //爬取html
   async getRawHtml() {
@@ -62,29 +24,29 @@ class Crowller {
     // this.getCourseInfo(result.text)
   }
 
-  //生成json文件
-  generateJsonContent(content:CourceResult){
-    const filePath = path.resolve(__dirname,'../data/course.json')
-    let fileContent:Content = {}
-    //如果文件存在，或者文件不存在
-    if(fs.existsSync(filePath)){
-      fileContent = JSON.parse(fs.readFileSync(filePath,'utf-8'))
-    }
-    fileContent[content.time] = content.data
-    return {filePath,fileContent}
-   
+  //写入文件
+  writeFile(content: string) {
+    fs.writeFileSync(this.filePath, content)
   }
 
   //入口，编码规范 减少耦合
   async initSpiderProcess() {
     const html = await this.getRawHtml()
-    const courseContent = this.getCourseInfo(html)
-    const {filePath,fileContent} = this.generateJsonContent(courseContent)
-    fs.writeFileSync(filePath,JSON.stringify(fileContent))
+    // const courseContent = this.getCourseInfo(html)
+    // const {fileContent} = this.generateJsonContent(courseContent)
+    const fileContent = this.analyzer.analyze(html, this.filePath)
+    this.writeFile(fileContent)
   }
 
-  constructor() {
+  constructor(private url: string, private analyzer: Analyzer) {
     this.initSpiderProcess()
   }
 }
-const crowller = new Crowller()
+
+//模拟要爬取的网站
+// private url = `https://www.xbshare.cc/hot/hotmovie.html`
+//爬取电影网站 
+const url = `https://www.xbshare.cc/hot/hotmovie.html`
+
+const analyzer = new DellAnalyzer()
+const crowller = new Crowller(url, analyzer)
