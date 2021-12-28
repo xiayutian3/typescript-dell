@@ -52,3 +52,4 @@ const url = `https://www.xbshare.cc/hot/hotmovie.html`
 // const analyzer = new DellAnalyzer()
 const analyzer = DellAnalyzer.getInstance()
 const crowller = new Crowller(url, analyzer)
+console.log('s')
