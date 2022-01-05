@@ -6,25 +6,87 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const crowller_1 = __importDefault(require("./crowller"));
 const DellAnalyzer_1 = __importDefault(require("./DellAnalyzer"));
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
 const router = (0, express_1.Router)();
 router.get('/', (req, res) => {
-    res.send(`
-  <form action="/getdata" method="post">
-    <input type="password" name="password"/>
-    <button>提交</button>
-  </form>
-`);
-});
-router.post('/getdata', (req, res) => {
-    // const { password } = req.body;
-    console.log(req.body);
-    if (req.body.password !== '123') {
-        res.send('password error');
+    const isLogin = req.session ? req.session.login : false;
+    if (isLogin) {
+        res.send(`
+    <a href="/getdata">爬取内容</a>
+    <a href="/showdata">展示内容</a>
+    <a href="/logout">退出</a>
+  `);
     }
-    //爬取电影网站 
-    const url = `https://www.xbshare.cc/hot/hotmovie.html`;
-    const analyzer = DellAnalyzer_1.default.getInstance();
-    const crowller = new crowller_1.default(url, analyzer);
-    res.send('data sucess');
+    else {
+        res.send(`
+    <form action="/login" method="post">
+      <input type="password" name="password"/>
+      <button>登录</button>
+    </form>
+  `);
+    }
+});
+//退出登录
+router.get('/logout', (req, res) => {
+    if (req.session) {
+        req.session.login = undefined;
+    }
+    res.redirect('/');
+});
+//登录
+router.post('/login', (req, res) => {
+    const { password } = req.body;
+    //是否已经登陆过
+    const isLogin = req.session ? req.session.login : false;
+    if (isLogin) {
+        res.send('已经登陆过');
+    }
+    else {
+        if (password === '123' && req.session) {
+            //登录凭证
+            req.session.login = true;
+            res.send('登陆成功！');
+        }
+        else {
+            res.send('登陆失败');
+        }
+    }
+});
+//请求数据
+router.get('/getdata', (req, res) => {
+    //是否已经登陆过
+    const isLogin = req.session ? req.session.login : false;
+    if (isLogin) {
+        //爬取电影网站 
+        const url = `https://www.xbshare.cc/hot/hotmovie.html`;
+        const analyzer = DellAnalyzer_1.default.getInstance();
+        const crowller = new crowller_1.default(url, analyzer);
+        //类型融合后就会有自动提示 req.teacherName
+        // res.send(`data sucess${req.teacherName}`);
+        res.send(`data sucess`);
+    }
+    else {
+        res.send(`请登录后爬取内容`);
+    }
+});
+//展示内容
+router.get('/showdata', (req, res) => {
+    //是否已经登陆过
+    const isLogin = req.session ? req.session.login : false;
+    if (isLogin) {
+        try {
+            const position = path_1.default.resolve(__dirname, '../data/course.json');
+            // const result = fs.readFileSync(position, 'utf-8')
+            const result = fs_1.default.readFileSync(position, 'utf8'); //一样的效果 'utf-8'   'utf8'
+            res.json(JSON.parse(result));
+        }
+        catch (error) {
+            res.send('尚未爬取到内容');
+        }
+    }
+    else {
+        res.send('用户尚未登录');
+    }
 });
 exports.default = router;
