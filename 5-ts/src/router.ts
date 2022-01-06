@@ -1,8 +1,9 @@
-import { Router, Request, Response } from "express";
-import Crowller from './crowller';
-import DellAnalyzer from './DellAnalyzer'
 import fs from 'fs'
 import path from 'path'
+import { Router, Request, Response, NextFunction } from "express";
+import Crowller from './utils/crowller';
+import DellAnalyzer from './utils/DellAnalyzer'
+import { getResponseData } from './utils/util'
 
 //扩展Request的约束范围
 //解决：express库的类型定义文件 .d.ts文件类型描述不准确
@@ -13,10 +14,22 @@ interface RequestWidthBody extends Request {
   }
 }
 
+//判断登录的中间件
+const checkLogin = (req: RequestWidthBody, res: Response, next: NextFunction) => {
+  const isLogin = req.session ? req.session.login : false
+  if (isLogin) {
+    next()
+  } else {
+    // res.send('请先登录')
+    //接口标准化
+    res.json(getResponseData(null, '请先登录'))
+  }
+}
+
 
 const router = Router();
 
-router.get('/', (req: Request, res: Response) => {
+router.get('/', (req: RequestWidthBody, res: Response) => {
   const isLogin = req.session ? req.session.login : false
   if (isLogin) {
     res.send(`
@@ -35,11 +48,13 @@ router.get('/', (req: Request, res: Response) => {
 })
 
 //退出登录
-router.get('/logout', (req: Request, res: Response) => {
+router.get('/logout', (req: RequestWidthBody, res: Response) => {
   if (req.session) {
     req.session.login = undefined
   }
-  res.redirect('/')
+  // res.redirect('/')
+  //接口标准化
+  res.json(getResponseData(true))
 })
 
 //登录
@@ -48,52 +63,52 @@ router.post('/login', (req: RequestWidthBody, res: Response) => {
   //是否已经登陆过
   const isLogin = req.session ? req.session.login : false
   if (isLogin) {
-    res.send('已经登陆过')
+    // res.send('已经登陆过')
+    //接口标准化
+    res.json(getResponseData(false, '已经登陆过'))
   } else {
     if (password === '123' && req.session) {
       //登录凭证
       req.session.login = true
-      res.send('登陆成功！')
+      // res.send('登陆成功！')
+      //接口标准化
+      res.json(getResponseData(true))
     } else {
-      res.send('登陆失败')
+      // res.send('登陆失败')
+      //接口标准化
+      res.json(getResponseData(false, '登陆失败'))
     }
   }
 })
 
 //请求数据
-router.get('/getdata', (req: RequestWidthBody, res: Response) => {
-  //是否已经登陆过
-  const isLogin = req.session ? req.session.login : false
-  if (isLogin) {
-    //爬取电影网站 
-    const url = `https://www.xbshare.cc/hot/hotmovie.html`
+router.get('/getdata', checkLogin, (req: RequestWidthBody, res: Response) => {
+  //爬取电影网站 
+  const url = `https://www.xbshare.cc/hot/hotmovie.html`
 
-    const analyzer = DellAnalyzer.getInstance()
-    const crowller = new Crowller(url, analyzer)
-    //类型融合后就会有自动提示 req.teacherName
-    // res.send(`data sucess${req.teacherName}`);
-    res.send(`data sucess`);
-  } else {
-    res.send(`请登录后爬取内容`);
-  }
+  const analyzer = DellAnalyzer.getInstance()
+  const crowller = new Crowller(url, analyzer)
+  //类型融合后就会有自动提示 req.teacherName
+  // res.send(`data sucess${req.teacherName}`);
+  // res.send(`data sucess`);
+  //接口标准化
+  res.json(getResponseData(true))
 
 })
 
 //展示内容
-router.get('/showdata', (req: RequestWidthBody, res: Response) => {
-  //是否已经登陆过
-  const isLogin = req.session ? req.session.login : false
-  if (isLogin) {
-    try {
-      const position = path.resolve(__dirname, '../data/course.json')
-      // const result = fs.readFileSync(position, 'utf-8')
-      const result = fs.readFileSync(position, 'utf8')  //一样的效果 'utf-8'   'utf8'
-      res.json(JSON.parse(result))
-    } catch (error) {
-      res.send('尚未爬取到内容')
-    }
-  } else {
-    res.send('用户尚未登录')
+router.get('/showdata', checkLogin, (req: RequestWidthBody, res: Response) => {
+  try {
+    const position = path.resolve(__dirname, '../data/course.json')
+    // const result = fs.readFileSync(position, 'utf-8')
+    const result = fs.readFileSync(position, 'utf8')  //一样的效果 'utf-8'   'utf8'
+    // res.json(JSON.parse(result))
+    //接口标准化
+    res.json(getResponseData(JSON.parse(result)))
+  } catch (error) {
+    // res.send('尚未爬取到内容')
+    //接口标准化
+    res.json(getResponseData(false, '尚未爬取到内容'))
   }
 
 })

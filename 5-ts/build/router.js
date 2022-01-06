@@ -3,11 +3,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
-const crowller_1 = __importDefault(require("./crowller"));
-const DellAnalyzer_1 = __importDefault(require("./DellAnalyzer"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
+const express_1 = require("express");
+const crowller_1 = __importDefault(require("./utils/crowller"));
+const DellAnalyzer_1 = __importDefault(require("./utils/DellAnalyzer"));
+const util_1 = require("./utils/util");
+//判断登录的中间件
+const checkLogin = (req, res, next) => {
+    const isLogin = req.session ? req.session.login : false;
+    if (isLogin) {
+        next();
+    }
+    else {
+        // res.send('请先登录')
+        //接口标准化
+        res.json((0, util_1.getResponseData)(null, '请先登录'));
+    }
+};
 const router = (0, express_1.Router)();
 router.get('/', (req, res) => {
     const isLogin = req.session ? req.session.login : false;
@@ -32,7 +45,9 @@ router.get('/logout', (req, res) => {
     if (req.session) {
         req.session.login = undefined;
     }
-    res.redirect('/');
+    // res.redirect('/')
+    //接口标准化
+    res.json((0, util_1.getResponseData)(true));
 });
 //登录
 router.post('/login', (req, res) => {
@@ -40,53 +55,51 @@ router.post('/login', (req, res) => {
     //是否已经登陆过
     const isLogin = req.session ? req.session.login : false;
     if (isLogin) {
-        res.send('已经登陆过');
+        // res.send('已经登陆过')
+        //接口标准化
+        res.json((0, util_1.getResponseData)(false, '已经登陆过'));
     }
     else {
         if (password === '123' && req.session) {
             //登录凭证
             req.session.login = true;
-            res.send('登陆成功！');
+            // res.send('登陆成功！')
+            //接口标准化
+            res.json((0, util_1.getResponseData)(true));
         }
         else {
-            res.send('登陆失败');
+            // res.send('登陆失败')
+            //接口标准化
+            res.json((0, util_1.getResponseData)(false, '登陆失败'));
         }
     }
 });
 //请求数据
-router.get('/getdata', (req, res) => {
-    //是否已经登陆过
-    const isLogin = req.session ? req.session.login : false;
-    if (isLogin) {
-        //爬取电影网站 
-        const url = `https://www.xbshare.cc/hot/hotmovie.html`;
-        const analyzer = DellAnalyzer_1.default.getInstance();
-        const crowller = new crowller_1.default(url, analyzer);
-        //类型融合后就会有自动提示 req.teacherName
-        // res.send(`data sucess${req.teacherName}`);
-        res.send(`data sucess`);
-    }
-    else {
-        res.send(`请登录后爬取内容`);
-    }
+router.get('/getdata', checkLogin, (req, res) => {
+    //爬取电影网站 
+    const url = `https://www.xbshare.cc/hot/hotmovie.html`;
+    const analyzer = DellAnalyzer_1.default.getInstance();
+    const crowller = new crowller_1.default(url, analyzer);
+    //类型融合后就会有自动提示 req.teacherName
+    // res.send(`data sucess${req.teacherName}`);
+    // res.send(`data sucess`);
+    //接口标准化
+    res.json((0, util_1.getResponseData)(true));
 });
 //展示内容
-router.get('/showdata', (req, res) => {
-    //是否已经登陆过
-    const isLogin = req.session ? req.session.login : false;
-    if (isLogin) {
-        try {
-            const position = path_1.default.resolve(__dirname, '../data/course.json');
-            // const result = fs.readFileSync(position, 'utf-8')
-            const result = fs_1.default.readFileSync(position, 'utf8'); //一样的效果 'utf-8'   'utf8'
-            res.json(JSON.parse(result));
-        }
-        catch (error) {
-            res.send('尚未爬取到内容');
-        }
+router.get('/showdata', checkLogin, (req, res) => {
+    try {
+        const position = path_1.default.resolve(__dirname, '../data/course.json');
+        // const result = fs.readFileSync(position, 'utf-8')
+        const result = fs_1.default.readFileSync(position, 'utf8'); //一样的效果 'utf-8'   'utf8'
+        // res.json(JSON.parse(result))
+        //接口标准化
+        res.json((0, util_1.getResponseData)(JSON.parse(result)));
     }
-    else {
-        res.send('用户尚未登录');
+    catch (error) {
+        // res.send('尚未爬取到内容')
+        //接口标准化
+        res.json((0, util_1.getResponseData)(false, '尚未爬取到内容'));
     }
 });
 exports.default = router;

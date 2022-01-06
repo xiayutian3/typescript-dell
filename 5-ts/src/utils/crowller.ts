@@ -13,7 +13,7 @@ export interface Analyzer {
 
 
 class Crowller {
-  private filePath = path.resolve(__dirname, '../data/course.json')
+  private filePath = path.resolve(__dirname, '../../data/course.json')
 
   //爬取html
   private async getRawHtml() {
