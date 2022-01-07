@@ -1,44 +1,28 @@
-//类的装饰器
-//类接受的参数是构造函数
-//装饰器的本身是一个函数
-//装饰器通过 @ 符号来使用
-//多个装饰器的时候，装饰器执行的顺序从下到上，从右到左
+// 装饰方法
+//普通方法 ，target 对应的是类的prototype
+//静态方法 ， target 对应的是类的 构造函数
+//key：对应的方法名字
 
-
-// function testDecorator(constructor: any) {
-//   // console.log('testDecorator')
-//   constructor.prototype.getName = () => {
-//     console.log('hello')
-//   }
-// }
-// function testDecorator1(constructor: any) {
-//   console.log('testDecorator1')
-//   // constructor.prototype.getName = () => {
-//   //   console.log('hello')
-//   // }
-// }
-
-
-//有时候我们需要或者不需要装饰的时候，可以做条件判断
-function testDecorator(flag: boolean) {
-  if (flag) {
-    return function (constructor: any) {
-      // console.log('testDecorator')
-      constructor.prototype.getName = () => {
-        console.log('hello')
-      }
-    }
-  } else {
-    //返回一个空的装饰器
-    return function (constructor: any) { }
+function getNameDecorator(target: any, key: string, descriptor: PropertyDescriptor) {
+  // console.log(target,key)
+  //不可修改
+  // descriptor.writable = false;
+  //对原来的方法做变更
+  descriptor.value = function () {
+    return 'descriptor';
   }
-
 }
 
-@testDecorator(true)
-// @testDecorator1
 class Test {
-
+  name: string;
+  constructor(name: string) { //先执行
+    this.name = name
+  }
+  @getNameDecorator
+  getName() { return this.name }
+  //  static getName() { return this.name }
 }
-const test = new Test();
-(test as any).getName()
+
+const test = new Test('hello');
+// test.getName = function() { return '123'}
+console.log('test: ', test.getName());
