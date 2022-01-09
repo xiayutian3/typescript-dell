@@ -42,7 +42,7 @@
  * 
  * @param target 对应的是类的prototype
  * @param key 对应的属性名字
- */ 
+ */
 
 // //属性装饰器对属性进行装饰
 //  function nameDecorator(target: any, key: string):any {
@@ -74,25 +74,82 @@
 
 /************************************************************8 */
 
-//6 参数装饰器
-/**
- * 
- * @param target 对应的是类的prototype
- * @param key  对应的方法名字
- * @param paramIndex 参数在第几个位置 从0开始
- */
+// //6 参数装饰器
+// /**
+//  * 
+//  * @param target 对应的是类的prototype
+//  * @param key  对应的方法名字
+//  * @param paramIndex 参数在第几个位置 从0开始
+//  */
 
-function paramDecorator(target: any, key: string,paramIndex: number) {
-  console.log('target: ', target);
-  console.log('key: ', key);
-  console.log('paramIndex: ', paramIndex);
-}
-class Test {
-  getInfo(@paramDecorator name:string,age:number){ 
-    console.log(name,age)
+// function paramDecorator(target: any, key: string,paramIndex: number) {
+//   console.log('target: ', target);
+//   console.log('key: ', key);
+//   console.log('paramIndex: ', paramIndex);
+// }
+// class Test {
+//   getInfo(@paramDecorator name:string,age:number){ 
+//     console.log(name,age)
+//   }
+// }
+
+// const test = new Test();
+// console.log('test: ', test.getInfo('heelo',30));
+
+
+
+
+/********************************************************** */
+// 7。装饰器实际使用的例子
+
+const userinfo: any = undefined;
+
+//工厂函数模式
+function catchError(msg: string) {
+  return function (target: any, key: string, descriptor: PropertyDescriptor) {
+    const fn = descriptor.value;
+    descriptor.value = function () {
+      try {
+        fn()
+      } catch (error) {
+        console.log(msg)
+      }
+    }
   }
 }
 
-const test = new Test();
-console.log('test: ', test.getInfo('heelo',30));
+
+
+// 添加方法装饰器
+class Test {
+  // getName(){
+  //   try {
+  //     return userinfo.name;
+  //   } catch (error) {
+  //     console.log('userinfo.name 不存在 ')
+  //   }
+  // }
+  // getAge(){
+  //   try {
+  //     return userinfo.age;
+  //   } catch (error) {
+  //     console.log('userinfo.age 不存在 ')
+  //   }
+  // }
+
+  // 添加方法装饰器后
+  @catchError('userinfo.name 不存在')
+  getName() {
+    return userinfo.name;
+  }
+  @catchError('userinfo.age 不存在 ')
+  getAge() {
+    return userinfo.age;
+  }
+
+}
+
+const test = new Test()
+console.log(test.getName())
+console.log(test.getAge())
 
