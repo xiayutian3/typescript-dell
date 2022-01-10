@@ -6,7 +6,9 @@ import cookieSession from 'cookie-session'
 
 // 更新后的路由(自动生成新的路由)
 import './controller/LoginController'
-import {router} from './controller/decorator'
+import './controller/CrowllerController'
+// import { router } from './controller/decorator'
+import router from './router'
 
 
 

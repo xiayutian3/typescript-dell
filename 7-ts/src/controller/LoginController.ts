@@ -5,7 +5,8 @@
 import 'reflect-metadata'
 import { Request, Response } from "express";
 
-import { controller, get,post } from './decorator';
+// import { controller, get,post } from './decorator';
+import { controller, get, post } from '../decorator'
 import { getResponseData } from '../utils/util';
 
 
@@ -19,14 +20,18 @@ interface RequestWidthBody extends Request {
 }
 
 
-@controller
-class LoginController {
-  
+@controller('/')
+export class LoginController {
+
+  static isLogin(req:RequestWidthBody):boolean{
+    return !!(req.session ? req.session.login : false)
+  }
+
   @post('/login')
-  login(req: RequestWidthBody, res: Response) {
+  login(req: RequestWidthBody, res: Response): void {
     const { password } = req.body;
     //是否已经登陆过
-    const isLogin = req.session ? req.session.login : false
+    const isLogin = LoginController.isLogin(req)
     if (isLogin) {
       // res.send('已经登陆过')
       //接口标准化
@@ -47,7 +52,7 @@ class LoginController {
   }
 
   @get('/logout')
-  logout(req: RequestWidthBody, res: Response) {
+  logout(req: RequestWidthBody, res: Response): void {
     if (req.session) {
       req.session.login = undefined
     }
@@ -57,8 +62,8 @@ class LoginController {
   }
 
   @get('/')
-  home(req: RequestWidthBody, res: Response) {
-    const isLogin = req.session ? req.session.login : false
+  home(req: RequestWidthBody, res: Response): void {
+    const isLogin = LoginController.isLogin(req)
     if (isLogin) {
       res.send(`
       <a href="/getdata">爬取内容</a>

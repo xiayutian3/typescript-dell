@@ -10,7 +10,9 @@ var cookie_session_1 = __importDefault(require("cookie-session"));
 // import router from './router'
 // 更新后的路由(自动生成新的路由)
 require("./controller/LoginController");
-var decorator_1 = require("./controller/decorator");
+require("./controller/CrowllerController");
+// import { router } from './controller/decorator'
+var router_1 = __importDefault(require("./router"));
 // 问题1：express库的类型定义文件 .d.ts文件类型描述不准确
 // 问题2：当我使用中间件的时候，对res req做了修改之后，实际上类型并不能实时改变，
 // 如：在req.helloword = 123  Request类型上并没有helloword属性
@@ -31,7 +33,7 @@ app.use((0, cookie_session_1.default)({
 //   req.teacherName = 'heelo'
 //   next()
 // })
-app.use(decorator_1.router);
+app.use(router_1.default);
 // app.get('/',(rq:Request,res:Response) => {
 //   res.send('hello, world!');
 // })
