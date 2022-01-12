@@ -40,6 +40,6 @@ app.use(router_1.default);
 // app.get('/getdata',(rq:Request,res:Response) => {
 //   res.send('getdata,!');
 // })
-app.listen(3000, function () {
-    console.log('server is running at http://localhost:3000/');
+app.listen(3001, function () {
+    console.log('server is running at http://localhost:3001/');
 });

@@ -23,8 +23,15 @@ interface RequestWidthBody extends Request {
 @controller('/')
 export class LoginController {
 
-  static isLogin(req:RequestWidthBody):boolean{
+  static isLogin(req: RequestWidthBody): boolean {
     return !!(req.session ? req.session.login : false)
+  }
+
+  @get('/api/isLogin')
+  isLogin(req: RequestWidthBody, res: Response): void {
+    //是否已经登陆过
+    const isLogin = LoginController.isLogin(req)
+    res.json(getResponseData(isLogin))
   }
 
   @post('/login')
