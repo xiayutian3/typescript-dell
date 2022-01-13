@@ -35,7 +35,7 @@ var LoginController = /** @class */ (function () {
         if (isLogin) {
             // res.send('已经登陆过')
             //接口标准化
-            res.json((0, util_1.getResponseData)(false, '已经登陆过'));
+            res.json((0, util_1.getResponseData)(true));
         }
         else {
             if (password === '123' && req.session) {
@@ -60,18 +60,9 @@ var LoginController = /** @class */ (function () {
         //接口标准化
         res.json((0, util_1.getResponseData)(true));
     };
-    LoginController.prototype.home = function (req, res) {
-        var isLogin = LoginController_1.isLogin(req);
-        if (isLogin) {
-            res.send("\n      <a href=\"/getdata\">\u722C\u53D6\u5185\u5BB9</a>\n      <a href=\"/showdata\">\u5C55\u793A\u5185\u5BB9</a>\n      <a href=\"/logout\">\u9000\u51FA</a>\n    ");
-        }
-        else {
-            res.send("\n      <form action=\"/login\" method=\"post\">\n        <input type=\"password\" name=\"password\"/>\n        <button>\u767B\u5F55</button>\n      </form>\n    ");
-        }
-    };
     var LoginController_1;
     __decorate([
-        (0, decorator_1.get)('/api/isLogin'),
+        (0, decorator_1.get)('/isLogin'),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object, Object]),
         __metadata("design:returntype", void 0)
@@ -88,14 +79,8 @@ var LoginController = /** @class */ (function () {
         __metadata("design:paramtypes", [Object, Object]),
         __metadata("design:returntype", void 0)
     ], LoginController.prototype, "logout", null);
-    __decorate([
-        (0, decorator_1.get)('/'),
-        __metadata("design:type", Function),
-        __metadata("design:paramtypes", [Object, Object]),
-        __metadata("design:returntype", void 0)
-    ], LoginController.prototype, "home", null);
     LoginController = LoginController_1 = __decorate([
-        (0, decorator_1.controller)('/')
+        (0, decorator_1.controller)('/api')
     ], LoginController);
     return LoginController;
 }());

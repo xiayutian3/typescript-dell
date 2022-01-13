@@ -20,14 +20,14 @@ interface RequestWidthBody extends Request {
 }
 
 
-@controller('/')
+@controller('/api')
 export class LoginController {
 
   static isLogin(req: RequestWidthBody): boolean {
     return !!(req.session ? req.session.login : false)
   }
 
-  @get('/api/isLogin')
+  @get('/isLogin')
   isLogin(req: RequestWidthBody, res: Response): void {
     //是否已经登陆过
     const isLogin = LoginController.isLogin(req)
@@ -42,7 +42,7 @@ export class LoginController {
     if (isLogin) {
       // res.send('已经登陆过')
       //接口标准化
-      res.json(getResponseData(false, '已经登陆过'))
+      res.json(getResponseData(true))
     } else {
       if (password === '123' && req.session) {
         //登录凭证
@@ -68,22 +68,24 @@ export class LoginController {
     res.json(getResponseData(true))
   }
 
-  @get('/')
-  home(req: RequestWidthBody, res: Response): void {
-    const isLogin = LoginController.isLogin(req)
-    if (isLogin) {
-      res.send(`
-      <a href="/getdata">爬取内容</a>
-      <a href="/showdata">展示内容</a>
-      <a href="/logout">退出</a>
-    `);
-    } else {
-      res.send(`
-      <form action="/login" method="post">
-        <input type="password" name="password"/>
-        <button>登录</button>
-      </form>
-    `);
-    }
-  }
+  // 已经移到了前端页面了
+
+  // @get('/')
+  // home(req: RequestWidthBody, res: Response): void {
+  //   const isLogin = LoginController.isLogin(req)
+  //   if (isLogin) {
+  //     res.send(`
+  //     <a href="/getdata">爬取内容</a>
+  //     <a href="/showdata">展示内容</a>
+  //     <a href="/logout">退出</a>
+  //   `);
+  //   } else {
+  //     res.send(`
+  //     <form action="/login" method="post">
+  //       <input type="password" name="password"/>
+  //       <button>登录</button>
+  //     </form>
+  //   `);
+  //   }
+  // }
 }

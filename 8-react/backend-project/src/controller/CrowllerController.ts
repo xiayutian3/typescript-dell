@@ -25,7 +25,7 @@ interface RequestWidthBody extends Request {
 
 //判断登录的中间件
 const checkLogin = (req: RequestWidthBody, res: Response, next: NextFunction): void => {
-  console.log('我是checkLogin中间件')
+  // console.log('我是checkLogin中间件')
   const isLogin = !!(req.session ? req.session.login : false) //添加两个！！，推断为boolean类型
   if (isLogin) {
     next()
@@ -44,13 +44,13 @@ const test = (req: RequestWidthBody, res: Response, next: NextFunction): void =>
 
 
 
-@controller('/')
+@controller('/api')
 export class CrowllerController {
 
   @get('/getdata')
   //use装饰器，使用中间件
   @use(checkLogin)
-  @use(test)
+  // @use(test)
   getdata(req: RequestWidthBody, res: Response): void {
     //爬取电影网站 
     const url = `https://www.xbshare.cc/hot/hotmovie.html`

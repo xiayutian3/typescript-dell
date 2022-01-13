@@ -25,7 +25,7 @@ var DellAnalyzer_1 = __importDefault(require("../utils/DellAnalyzer"));
 var crowller_1 = __importDefault(require("../utils/crowller"));
 //判断登录的中间件
 var checkLogin = function (req, res, next) {
-    console.log('我是checkLogin中间件');
+    // console.log('我是checkLogin中间件')
     var isLogin = !!(req.session ? req.session.login : false); //添加两个！！，推断为boolean类型
     if (isLogin) {
         next();
@@ -44,6 +44,7 @@ var test = function (req, res, next) {
 var CrowllerController = /** @class */ (function () {
     function CrowllerController() {
     }
+    // @use(test)
     CrowllerController.prototype.getdata = function (req, res) {
         //爬取电影网站 
         var url = "https://www.xbshare.cc/hot/hotmovie.html";
@@ -75,7 +76,6 @@ var CrowllerController = /** @class */ (function () {
         //use装饰器，使用中间件
         ,
         (0, decorator_1.use)(checkLogin),
-        (0, decorator_1.use)(test),
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object, Object]),
         __metadata("design:returntype", void 0)
@@ -90,7 +90,7 @@ var CrowllerController = /** @class */ (function () {
         __metadata("design:returntype", void 0)
     ], CrowllerController.prototype, "showdata", null);
     CrowllerController = __decorate([
-        (0, decorator_1.controller)('/')
+        (0, decorator_1.controller)('/api')
     ], CrowllerController);
     return CrowllerController;
 }());
