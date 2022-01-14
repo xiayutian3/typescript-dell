@@ -3,7 +3,8 @@ import { LockOutlined } from "@ant-design/icons";
 //版本更新后并没有这个
 // import {WrappedFormUtils} from 'antd/lib/form/Form'
 
-import axios from "axios";
+// import axios from "axios";
+import request from '../../request'
 import qs from "qs";
 import "./login.css";
 import { Component } from "react";
@@ -24,14 +25,15 @@ class NormalLoginForm extends Component {
 
   onFinish = (values: any) => {
     console.log("Received values of form: ", values);
-    axios
-      .post("/api/login", qs.stringify({ password: values.password }), {
+    request
+      .post("/login", qs.stringify({ password: values.password }), {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       })
       .then((res) => {
-        if(res.data?.data){
+        const data:resposeResult.login = res.data
+        if(data){
           this.setState({ isLogin: true });
         }else{
           message.error('登录失败')

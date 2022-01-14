@@ -23,6 +23,15 @@ var decorator_1 = require("../decorator");
 var util_1 = require("../utils/util");
 var DellAnalyzer_1 = __importDefault(require("../utils/DellAnalyzer"));
 var crowller_1 = __importDefault(require("../utils/crowller"));
+// //返回的数据类型 
+// interface CourseItem {
+//   title: string;
+//   year: string;
+// }
+// //爬取数据的类型
+// interface DataStructure {
+//   [key: string]: CourseItem[];
+// }
 //判断登录的中间件
 var checkLogin = function (req, res, next) {
     // console.log('我是checkLogin中间件')

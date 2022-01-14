@@ -1,8 +1,10 @@
 import React, { Component } from "react";
 import { Button, message } from "antd";
-import axios from "axios";
+// import axios from "axios";
+import request from "../request";
 import { Navigate } from "react-router-dom";
 import ReactEcharts from "echarts-for-react";
+// import * from 'echarts'
 import moment from "moment";
 import "./style.css";
 
@@ -32,17 +34,19 @@ import "./style.css";
 //     };
 //   }
 
-interface CourseItem {
-  title: string;
-  year: string;
-}
+// interface CourseItem {
+//   title: string;
+//   year: string;
+// }
+// //爬取数据的类型
+// interface DataStructure {
+//   [key: string]: CourseItem[];
+// }
 
 interface State {
   load: boolean;
   isLogin: boolean;
-  data: {
-    [key: string]: CourseItem[];
-  };
+  data: resposeResult.DataStructure;
 }
 
 //可以这样，就会把react中的state类型复写掉(state的类型推导)
@@ -55,8 +59,9 @@ class Home extends Component {
 
   // 退出登录
   handleLoginClick = (e: React.MouseEvent) => {
-    axios.get("/api/logout").then((res) => {
-      if (res.data?.data) {
+    request.get("/logout").then((res: any) => {
+      const data:resposeResult.logout = res.data;
+      if (data) {
         this.setState({
           isLogin: false,
         });
@@ -66,8 +71,9 @@ class Home extends Component {
 
   //爬取数据
   handleCrowllerClick = () => {
-    axios.get("/api/getdata").then((res) => {
-      if (res.data?.data) {
+    request.get("/getdata").then((res: any) => {
+      const data: resposeResult.getdata = res.data;
+      if (data) {
         message.success("爬取成功");
       } else {
         message.error("爬取失败");
@@ -87,21 +93,23 @@ class Home extends Component {
       times.push(moment(Number(i)).format("MM-DD HH:mm"));
       const item = data[i];
       item.forEach((innerItem) => {
-        const {title, year} = innerItem
+        const { title, year } = innerItem;
         if (courseNames.indexOf(title) === -1) {
           courseNames.push(title);
         }
-        tempData[title]? tempData[title]?.push(year): (tempData[title] = [year])
+        tempData[title]
+          ? tempData[title]?.push(year)
+          : (tempData[title] = [year]);
       });
     }
     // console.log('courseNames: ', courseNames);
-    const result:any[] = []
-    for(let i in tempData){
+    const result: any[] = [];
+    for (let i in tempData) {
       result.push({
         name: i,
         type: "line",
-        data: tempData[i]
-      })
+        data: tempData[i],
+      });
     }
     return {
       title: {
@@ -127,13 +135,14 @@ class Home extends Component {
       yAxis: {
         type: "value",
       },
-      series: result
+      series: result,
     };
   };
 
   componentDidMount() {
-    axios.get("/api/isLogin").then((res) => {
-      if (!res.data?.data) {
+    request.get("/isLogin").then((res: any) => {
+      const data: resposeResult.isLogin = res.data;
+      if (!data) {
         this.setState({
           isLogin: false,
           load: true,
@@ -146,11 +155,11 @@ class Home extends Component {
     });
 
     //获取展示数据
-    axios.get("/api/showdata").then((res) => {
-      if (res.data?.data) {
-        console.log(res.data.data);
+    request.get("/showdata").then((res: any) => {
+      const data: resposeResult.DataStructure = res.data;
+      if (data) {
         this.setState({
-          data: res.data.data,
+          data: data,
         });
       }
     });

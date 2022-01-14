@@ -31,7 +31,8 @@ export class LoginController {
   isLogin(req: RequestWidthBody, res: Response): void {
     //是否已经登陆过
     const isLogin = LoginController.isLogin(req)
-    res.json(getResponseData(isLogin))
+    const result = getResponseData<resposeResult.isLogin>(isLogin)
+    res.json(result)
   }
 
   @post('/login')
@@ -42,18 +43,18 @@ export class LoginController {
     if (isLogin) {
       // res.send('已经登陆过')
       //接口标准化
-      res.json(getResponseData(true))
+      res.json(getResponseData<boolean>(true))
     } else {
       if (password === '123' && req.session) {
         //登录凭证
         req.session.login = true
         // res.send('登陆成功！')
         //接口标准化
-        res.json(getResponseData(true))
+        res.json(getResponseData<resposeResult.login>(true))
       } else {
         // res.send('登陆失败')
         //接口标准化
-        res.json(getResponseData(false, '登陆失败'))
+        res.json(getResponseData<resposeResult.login>(false, '登陆失败'))
       }
     }
   }
@@ -65,7 +66,7 @@ export class LoginController {
     }
     // res.redirect('/')
     //接口标准化
-    res.json(getResponseData(true))
+    res.json(getResponseData<resposeResult.logout>(true))
   }
 
   // 已经移到了前端页面了

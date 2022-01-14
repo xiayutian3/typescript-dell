@@ -23,6 +23,16 @@ interface RequestWidthBody extends Request {
   }
 }
 
+// //返回的数据类型 
+// interface CourseItem {
+//   title: string;
+//   year: string;
+// }
+// //爬取数据的类型
+// interface DataStructure {
+//   [key: string]: CourseItem[];
+// }
+
 //判断登录的中间件
 const checkLogin = (req: RequestWidthBody, res: Response, next: NextFunction): void => {
   // console.log('我是checkLogin中间件')
@@ -61,7 +71,7 @@ export class CrowllerController {
     // res.send(`data sucess${req.teacherName}`);
     // res.send(`data sucess`);
     //接口标准化
-    res.json(getResponseData(true))
+    res.json(getResponseData<resposeResult.getdata>(true))
   }
 
   @get('/showdata')
@@ -74,11 +84,11 @@ export class CrowllerController {
       const result = fs.readFileSync(position, 'utf8')  //一样的效果 'utf-8'   'utf8'
       // res.json(JSON.parse(result))
       //接口标准化
-      res.json(getResponseData(JSON.parse(result)))
+      res.json(getResponseData<resposeResult.showdata>(JSON.parse(result)))
     } catch (error) {
       // res.send('尚未爬取到内容')
       //接口标准化
-      res.json(getResponseData(false, '尚未爬取到内容'))
+      res.json(getResponseData<resposeResult.showdata>(false, '尚未爬取到内容'))
     }
   }
 }

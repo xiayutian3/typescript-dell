@@ -1,11 +1,11 @@
-interface Result {
+interface Result<T> {
   success: boolean;
   errMsg?: string;
-  data: any;
+  data: T;
 }
 
 //返回类型固定的结果，接口标准化
-export const getResponseData = (data: any, errMsg?: string): Result => {
+export const getResponseData = <T>(data: T, errMsg?: string): Result<T> => {
   if (errMsg) {
     return {
       success: false,

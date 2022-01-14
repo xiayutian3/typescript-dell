@@ -26,7 +26,8 @@ var LoginController = /** @class */ (function () {
     LoginController.prototype.isLogin = function (req, res) {
         //是否已经登陆过
         var isLogin = LoginController_1.isLogin(req);
-        res.json((0, util_1.getResponseData)(isLogin));
+        var result = (0, util_1.getResponseData)(isLogin);
+        res.json(result);
     };
     LoginController.prototype.login = function (req, res) {
         var password = req.body.password;
