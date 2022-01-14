@@ -3,6 +3,7 @@
 
 
 // 定义全局函数 
+// declare function $(params:()=>void):void;
 
 interface JqueryInstance {
   //还是返回jq对象 JqueryInstance
